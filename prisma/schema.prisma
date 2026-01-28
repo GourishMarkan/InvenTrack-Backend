@@ -6,38 +6,81 @@
 
 generator client {
   provider = "prisma-client"
-  output= "../src/generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-
-model User{
-  id Int @id @default (autoincrement())
-  email String @unique
-  name String
-  createdAt DateTime   @default(now())
-  password String
-  isAdmin Boolean @default(false)
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  password  String
+  role   Role @default(User)
 }
 
-model Company{
-  id Int @id @default(autoincrement())
-  name String
+model Company {
+  id       Int       @id @default(autoincrement())
+  name     String
   products Product[]
-
 }
 
-model Product{
-  id Int @id @default(autoincrement())
-  name String
-  price Int
-  stock Int 
-  companyId Int 
-  company Company @relation(fields: [companyId],references: [id])
+model Product {
+  id        Int     @id @default(autoincrement())
+  name      String
+  costPrice     Int
+  sellingPrice Int
+  stock     Int
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
 
-
+  orderItems OrderItem[]
 }
 
+// order model
+model OrderItem {
+  id           Int @id @default(autoincrement())
+  productId    Int
+  quantity     Int
+  orderId      Int
+  sellingPrice Int
+  costPrice Int
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+  order   Order   @relation(fields: [orderId], references: [id])
+ @@index([orderId])
+ @@index([productId])
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  orderItems OrderItem[]
+  createdAt  DateTime @default(now())
+  total Int
+  paymentType PaymentType @default(Cash)
+  paymentStatus PaymentStatus @default(Pending)
+}
+
+enum PaymentType{
+  Cash
+  Upi
+  CreditCard
+  DebitCard
+}
+
+enum PaymentStatus{
+  Done
+  Pending
+  Failed
+}
+
+enum Role{
+  User
+  Admin
+}
+
+// model of order Item
