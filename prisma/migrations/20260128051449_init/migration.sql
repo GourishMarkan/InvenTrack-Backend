@@ -75,6 +75,12 @@ CREATE INDEX "OrderItem_productId_idx" ON "OrderItem"("productId");
 -- AddForeignKey
 ALTER TABLE "Product" ADD CONSTRAINT "Product_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- Constraint on stock selling and cost price
+ALTER TABLE "Product" ADD CONSTRAINT "stock_non_negative" CHECK(stock>=0);
+
+ALTER TABLE "Product" ADD CONSTRAINT "cost_price_non_negative" CHECK(costPrice>=0);
+
+ALTER TABLE "Product" ADD CONSTRAINT "selling_price_non_negative" CHECK(sellingPrice>=0);
 -- AddForeignKey
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

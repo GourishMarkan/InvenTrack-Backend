@@ -33,10 +33,10 @@ model Product {
   name      String
   costPrice     Int
   sellingPrice Int
-  stock     Int
+  stock     Int 
   companyId Int
   company   Company @relation(fields: [companyId], references: [id])
-
+  createdAt DateTime @default(now())
   orderItems OrderItem[]
 }
 
