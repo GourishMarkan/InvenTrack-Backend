@@ -19,68 +19,126 @@ model User {
   name      String
   createdAt DateTime @default(now())
   password  String
-  role   Role @default(User)
+  role      Role     @default(User)
 }
 
-model Company {
-  id       Int       @id @default(autoincrement())
-  name     String
-  products Product[]
+model Supplier {
+  id        Int        @id @default(autoincrement())
+  name      String
+  products  Product[]
+  purchases Purchase[]
 }
 
 model Product {
-  id        Int     @id @default(autoincrement())
-  name      String
+  id            Int            @id @default(autoincrement())
+  name          String
   costPrice     Int
-  sellingPrice Int
-  stock     Int 
-  companyId Int
-  company   Company @relation(fields: [companyId], references: [id])
-  createdAt DateTime @default(now())
-  orderItems OrderItem[]
+  sellingPrice  Int
+  stock         Int
+  supplierId    Int
+  supplier      Supplier       @relation(fields: [supplierId], references: [id])
+  createdAt     DateTime       @default(now())
+  orderItems    OrderItem[]
+  purchaseItems PurchaseItem[]
+
+  stockMovements StockMovement[]
 }
 
 // order model
 model OrderItem {
-  id           Int @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   productId    Int
   quantity     Int
   orderId      Int
   sellingPrice Int
-  costPrice Int
-  createdAt DateTime @default(now())
+  costPrice    Int
+  createdAt    DateTime @default(now())
 
-  product Product @relation(fields: [productId], references: [id])
-  order   Order   @relation(fields: [orderId], references: [id])
- @@index([orderId])
- @@index([productId])
+  product        Product         @relation(fields: [productId], references: [id])
+  order          Order           @relation(fields: [orderId], references: [id])
+  stockMovements StockMovement[]
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model Order {
-  id         Int         @id @default(autoincrement())
-  orderItems OrderItem[]
-  createdAt  DateTime @default(now())
-  total Int
-  paymentType PaymentType @default(Cash)
+  id            Int           @id @default(autoincrement())
+  orderItems    OrderItem[]
+  createdAt     DateTime      @default(now())
+  total         Int
+  paymentType   PaymentType   @default(Cash)
   paymentStatus PaymentStatus @default(Pending)
 }
 
-enum PaymentType{
+// purchase model--
+model Purchase {
+  id            Int            @id @default(autoincrement())
+  createdAt     DateTime       @default(now())
+  total         Int
+  purchaseItem  PurchaseItem[]
+  paymentType   PaymentType    @default(Cash)
+  paymentStatus PaymentStatus  @default(Pending)
+  totalQuantity Int
+  supplierId    Int
+  supplier      Supplier       @relation(fields: [supplierId], references: [id])
+  purchaseDate  DateTime
+
+  @@index([supplierId])
+}
+
+// purchase Item
+
+model PurchaseItem {
+  id             Int             @id @default(autoincrement())
+  productId      Int
+  product        Product         @relation(fields: [productId], references: [id])
+  purchaseId     Int // Add foreign key
+  purchase       Purchase        @relation(fields: [purchaseId], references: [id])
+  costPrice      Int
+  quantity       Int
+  stockMovements StockMovement[]
+}
+
+model StockMovement {
+  id             Int               @id @default(autoincrement())
+  productId      Int
+  orderItemId    Int?
+  purchaseItemId Int?
+  quantity       Int
+  createdAt      DateTime          @default(now())
+  type           StockMovementType @default(Purchase)
+  product        Product           @relation(fields: [productId], references: [id])
+  orderItem      OrderItem?        @relation(fields: [orderItemId], references: [id])
+  purchaseItem   PurchaseItem?     @relation(fields: [purchaseItemId], references: [id])
+  @@index([orderItemId])
+  @@index([purchaseItemId])
+  @@index([productId])
+}
+
+enum PaymentType {
   Cash
   Upi
   CreditCard
   DebitCard
 }
 
-enum PaymentStatus{
+enum PaymentStatus {
   Done
   Pending
   Failed
 }
 
-enum Role{
+enum Role {
   User
   Admin
+}
+
+enum StockMovementType {
+  Sale
+  Purchase
+  Wastage
+  Adjustment
 }
 
 // model of order Item
