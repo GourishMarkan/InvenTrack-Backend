@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { GraphQLError } from 'graphql';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -10,7 +11,12 @@ export class UsersResolver {
 
   @Mutation(() => User)
   createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
-    return this.usersService.create(createUserInput);
+    try {
+      
+      return this.usersService.create(createUserInput);
+    } catch (error) {
+      throw new GraphQLError(error.message);
+    }
   }
 
   @Query(() => [User], { name: 'users' })

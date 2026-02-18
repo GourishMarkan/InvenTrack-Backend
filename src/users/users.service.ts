@@ -1,11 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
-  create(createUserInput: CreateUserInput) {
-    return 'This action adds a new user';
+  constructor(private prisma:PrismaService){}
+  async create(createUserInput: CreateUserInput) {
+    try {
+      const user=await this.prisma.user.create({
+        data:createUserInput
+      })
+      return user;
+    } catch (error) {
+      throw new HttpException(error.message,error.code);
+    }
   }
 
   findAll() {
