@@ -34,3 +34,13 @@ export const Role = {
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
+
+
+export const StockMovementType = {
+  Sale: 'Sale',
+  Purchase: 'Purchase',
+  Wastage: 'Wastage',
+  Adjustment: 'Adjustment'
+} as const
+
+export type StockMovementType = (typeof StockMovementType)[keyof typeof StockMovementType]

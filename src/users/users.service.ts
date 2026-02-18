@@ -17,19 +17,47 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+   try {
+    return await this.prisma.user.findMany()
+   } catch (error) {
+    throw new HttpException(error.message,error.code)
+  }
+}
+
+async findOne(id: number) {
+  try {
+    return await this.prisma.user.findUnique({
+      where:{
+        id:id
+      }
+    })
+  } catch (error) {
+    throw new HttpException(error.message,error.code)
+    
+  }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async update(id: number, updateUserInput: UpdateUserInput) {
+    try {
+      const user=await this.prisma.user.update({
+        where:{
+          id:id
+        },
+        data:updateUserInput
+      })
+    
+    } catch (error) {
+      throw new HttpException(error.message,error.code)
+    }
   }
-
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  
+  async remove(id: number) {
+    try {
+      // const user
+    } catch (error) {
+       throw new HttpException(error.message,error.code)
+      
+     }
   }
 }

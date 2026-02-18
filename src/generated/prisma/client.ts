@@ -45,10 +45,10 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
- * Model Company
+ * Model Supplier
  * 
  */
-export type Company = Prisma.CompanyModel
+export type Supplier = Prisma.SupplierModel
 /**
  * Model Product
  * 
@@ -64,3 +64,18 @@ export type OrderItem = Prisma.OrderItemModel
  * 
  */
 export type Order = Prisma.OrderModel
+/**
+ * Model Purchase
+ * 
+ */
+export type Purchase = Prisma.PurchaseModel
+/**
+ * Model PurchaseItem
+ * 
+ */
+export type PurchaseItem = Prisma.PurchaseItemModel
+/**
+ * Model StockMovement
+ * 
+ */
+export type StockMovement = Prisma.StockMovementModel
