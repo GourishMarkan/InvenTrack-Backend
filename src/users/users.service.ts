@@ -50,7 +50,22 @@ async findOne(id: number) {
     throw new HttpException(error.message,error.code)
     
   }
+}
+
+async findOneByEmail(email:string){
+  try {
+    return await this.prisma.user.findFirst({
+      where:{
+        email:email,
+        isDeleted:false
+      }
+    })
+    
+  } catch (error) {
+    throw new HttpException(error.message,error.code)
+    
   }
+}
 
   async update(id: number, updateUserInput: UpdateUserInput) {
     try {
