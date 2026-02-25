@@ -3,6 +3,6 @@ export const  jwtConstants={
     return process.env.JWT_SECRET;
  },
    get expirationTime() {
-    return process.env.JWT_EXPIRESIN ;
+    return process.env.JWT_EXPIRESIN  ;
   },
 }
