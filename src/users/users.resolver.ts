@@ -4,6 +4,9 @@ import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { GraphQLError } from 'graphql';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from 'src/guards/gql-jwt-auth.guard';
+import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -24,9 +27,10 @@ export class UsersResolver {
     return this.usersService.findAll();
   }
 
-  @Query(() => User, { name: 'user' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.usersService.findOne(id);
+@Query(() => User)
+@UseGuards(GqlAuthGuard)
+  findOne(@CurrentUser() user:User ) {
+    return this.usersService.findOne(user.id);
   }
 
   @Mutation(() => User)

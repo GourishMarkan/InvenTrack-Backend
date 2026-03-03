@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LocalAuthGuard } from './passport/local-auth.guard';
-import { JwtAuthGuard } from './passport/jwt.guard';
+import { JwtAuthGuard } from '../guards/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
