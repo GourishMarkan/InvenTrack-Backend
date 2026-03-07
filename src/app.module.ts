@@ -8,15 +8,17 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { ProductsModule } from './products/products.module';
 @Module({
   imports: [
+    PrismaModule,
     ConfigModule.forRoot({
       envFilePath:`.env`,
       isGlobal:true
 }),
     UsersModule,
     AuthModule,
-    PrismaModule
+    ProductsModule
   ],
   controllers: [AppController],
   providers: [AppService,{
