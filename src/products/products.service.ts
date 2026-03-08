@@ -17,20 +17,57 @@ export class ProductsService {
       throw new HttpException(error.message,HttpStatus.BAD_REQUEST);
     }
   }
-
-  findAll() {
-    return `This action returns all products`;
+  
+  async findAll() {
+    try {
+      return this.prismaService.product.findMany();
+      
+    } catch (error) {
+     throw new HttpException(error.message,HttpStatus.BAD_REQUEST);
+     
+    }
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  
+  async  findOne(id: number) {
+    try {
+      return this.prismaService.product.findFirst({
+        where:{
+          id:id
+        }
+      })
+    } catch (error) {
+      throw new HttpException(error.message,HttpStatus.BAD_REQUEST);
+      
+    }
   }
-
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  
+  async   update(id: number, updateProductDto: UpdateProductDto) {
+    try {
+      return this.prismaService.product.update({
+        where:{
+          id:id
+        },
+        data:updateProductDto
+      })
+    } catch (error) {
+      throw new HttpException(error.message,HttpStatus.BAD_REQUEST);
+      
+    }
   }
-
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  
+  async  remove(id: number) {
+    try {
+      return this.prismaService.product.update({
+        where:{
+          id:id
+        },
+        data:{
+          isDeleted:true
+        }
+      })
+    } catch (error) {
+     throw new HttpException(error.message,HttpStatus.BAD_REQUEST);
+    
+   }
   }
 }
