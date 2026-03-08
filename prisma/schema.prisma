@@ -30,6 +30,7 @@ model Supplier {
   products  Product[]
   purchases Purchase[]
   mobileNumber String
+  isDeleted Boolean @default(false)
 }
 
 model Product {
