@@ -22,6 +22,11 @@ model User {
   password  String
   role      Role     @default(User)
   isDeleted Boolean @default(false)
+  createdProducts Product[] @relation("CreatedProducts")
+  updatedProducts Product[] @relation("UpdatedProducts")
+  userPurchases Purchase[] @relation("UserPurchases")   
+  stockMovement StockMovement[] @relation("UserStockMovement")
+  userCreatedOrder Order[] @relation("UserCreatedOrder")
 }
 
 model Supplier {
@@ -46,6 +51,11 @@ model Product {
   purchaseItems PurchaseItem[]
   isDeleted Boolean @default(false)
   stockMovements StockMovement[]
+  createdById Int
+  updatedById Int
+ createdBy User @relation("CreatedProducts",fields: [createdById],references: [id])
+  updatedBy User @relation("UpdatedProducts",fields: [updatedById],references: [id])
+  
 }
 
 // order model
@@ -57,7 +67,6 @@ model OrderItem {
   sellingPrice Int
   costPrice    Int
   createdAt    DateTime @default(now())
-
   product        Product         @relation(fields: [productId], references: [id])
   order          Order           @relation(fields: [orderId], references: [id])
   stockMovements StockMovement[]
@@ -68,11 +77,15 @@ model OrderItem {
 
 model Order {
   id            Int           @id @default(autoincrement())
+  // createdBy Int
   orderItems    OrderItem[]
   createdAt     DateTime      @default(now())
   total         Int
   paymentType   PaymentType   @default(Cash)
   paymentStatus PaymentStatus @default(Pending)
+  createdBy  Int
+  userCreatedOrder User @relation("UserCreatedOrder",fields: [createdBy],references: [id])
+
 }
 
 // purchase model--
@@ -87,7 +100,8 @@ model Purchase {
   supplierId    Int
   supplier      Supplier       @relation(fields: [supplierId], references: [id])
   purchaseDate  DateTime
-
+  createdBy Int 
+  user User @relation("UserPurchases",fields: [createdBy],references: [id])
   @@index([supplierId])
 }
 
@@ -115,6 +129,8 @@ model StockMovement {
   product        Product           @relation(fields: [productId], references: [id])
   orderItem      OrderItem?        @relation(fields: [orderItemId], references: [id])
   purchaseItem   PurchaseItem?     @relation(fields: [purchaseItemId], references: [id])
+  createdById Int 
+  userStockMovement User @relation("UserStockMovement",fields: [createdById],references: [id])
   @@index([orderItemId])
   @@index([purchaseItemId])
   @@index([productId])

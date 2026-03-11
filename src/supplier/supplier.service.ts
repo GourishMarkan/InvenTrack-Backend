@@ -42,13 +42,34 @@ export class SupplierService {
   throw new HttpException(error.message,error.BAD_REQUEST)
   
 }
-  }
+}
 
- async update(id: number, updateSupplierDto: UpdateSupplierDto) {
-    return `This action updates a #${id} supplier`;
+async update(id: number, updateSupplierDto: UpdateSupplierDto) {
+  try {
+    const update=this.prismaService.supplier.update({
+      where:{
+        id:id
+      },
+      data:updateSupplierDto
+    })
+    return update
+    
+  } catch (error) {
+    throw new HttpException(error.message,error.BAD_REQUEST)
+    
   }
+}
 
- async remove(id: number) {
-    return `This action removes a #${id} supplier`;
+async remove(id: number) {
+  try {
+    return this.prismaService.supplier.delete({
+      where:{
+        id
+      }
+    })
+  } catch (error) {
+    throw new HttpException(error.message,error.BAD_REQUEST)
+    
+}
   }
 }
