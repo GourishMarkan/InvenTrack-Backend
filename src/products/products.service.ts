@@ -8,15 +8,21 @@ import { SupplierService } from 'src/supplier/supplier.service';
 export class ProductsService {
   
   constructor( private prismaService:PrismaService ,private supplierService:SupplierService){}
- async create(createProductDto: CreateProductDto) {
+ async create(createProductDto: CreateProductDto,userId:number) {
       //  checking whether supplier is there
       const supplier=await this.supplierService.findOne(createProductDto.supplierId)
       if(!supplier){
            throw new NotFoundException('Supplier not found');
       }
+
  
       const product=await this.prismaService.product.create({
-        data:createProductDto
+        data:{
+          ...createProductDto,
+          createdBy:{connect:{id:userId}},
+          updatedBy:{connect:{id:userId}}
+
+        }
       })
       return product;
    
