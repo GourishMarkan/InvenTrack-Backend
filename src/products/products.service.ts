@@ -14,13 +14,15 @@ export class ProductsService {
       if(!supplier){
            throw new NotFoundException('Supplier not found');
       }
-
+     const {supplierId,...rest}=createProductDto;
  
       const product=await this.prismaService.product.create({
         data:{
           ...createProductDto,
-          createdBy:{connect:{id:userId}},
-          updatedBy:{connect:{id:userId}}
+          createdById:userId,
+          updatedById:userId
+          
+          
 
         }
       })
@@ -50,25 +52,30 @@ export class ProductsService {
   
   }
   
-  async   update(id: number, updateProductDto: UpdateProductDto) {
- 
-      return this.prismaService.product.update({
-        where:{
-          id:id
-        },
-        data:updateProductDto
-      })
-   
-  }
-  
-  async  remove(id: number) {
+  async   update(id: number, updateProductDto: UpdateProductDto,userId:number) {
  
       return this.prismaService.product.update({
         where:{
           id:id
         },
         data:{
-          isDeleted:true
+          ...updateProductDto,
+          updatedById:userId
+     
+        }
+      })
+   
+  }
+  
+  async  remove(id: number,userId:number) {
+ 
+      return this.prismaService.product.update({
+        where:{
+          id:id
+        },
+        data:{
+          isDeleted:true,
+          updatedById:userId
         }
       })
   
