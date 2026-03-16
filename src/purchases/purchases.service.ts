@@ -1,11 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+
 
 @Injectable()
 export class PurchasesService {
-  create(createPurchaseDto: CreatePurchaseDto) {
-    return 'This action adds a new purchase';
+  constructor(private prismaService:PrismaService){}
+  async create(createPurchaseDto: CreatePurchaseDto,userId:number) {
+        const result =await this.prismaService.$transaction(async(tx)=>{
+
+         const { purchaseItems, supplierId, ...rest } = createPurchaseDto;
+          const mainPurchase=await tx.purchase.create({
+            data:{
+             ...rest,
+             supplier:{connect:{id:supplierId}},
+          user:{ connect: { id: userId } }
+            },
+          })
+          // purchasesItem crud below
+
+          const createdItems=await  tx.purchaseItem.createMany({
+            data:purchaseItems.map((item)=>({
+              ...item,
+                purchaseId:mainPurchase.id
+
+            }))
+          })
+
+          // updating the stock 
+          // const purchase=await this.prismaService.purchase.createManyAndReturn({
+          //   data:
+          // })
+        })
   }
 
   findAll() {
