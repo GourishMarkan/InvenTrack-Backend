@@ -8,10 +8,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class PurchasesService {
   constructor(private prismaService:PrismaService){}
   async create(createPurchaseDto: CreatePurchaseDto,userId:number) {
-        const result =await this.prismaService.$transaction(async(tx)=>{
+    await this.prismaService.$transaction(async(tx)=>{
 
          const { purchaseItems, supplierId, ...rest } = createPurchaseDto;
-          const mainPurchase=await tx.purchase.create({
+          const purchase=await tx.purchase.create({
             data:{
              ...rest,
              supplier:{connect:{id:supplierId}},
@@ -23,24 +23,54 @@ export class PurchasesService {
           const createdItems=await  tx.purchaseItem.createMany({
             data:purchaseItems.map((item)=>({
               ...item,
-                purchaseId:mainPurchase.id
+                purchaseId:purchase.id
 
             }))
           })
 
           // updating the stock 
-          // const purchase=await this.prismaService.purchase.createManyAndReturn({
-          //   data:
-          // })
+        for (const item of purchaseItems) {
+            await tx.product.update({
+              where:{
+                id:item.productId
+              },
+              data:{
+                stock:{
+                  increment:item.quantity
+                }
+              }
+            })
+        }
+          // stockMovement 
+          // purchaseItems.map(async(item)=>(
+          const stocksMovements=  await tx.stockMovement.createMany({
+            data:purchaseItems.map((item)=>({
+              productId:item.productId,
+                quantity :item.quantity,
+              type:"Purchase",
+              createdById:userId,
+              purchaseItemId:purchase.id
+              // userStockMovement:{connect:{id:userId}}
+              
+
+            }))
+          })
+          return { purchase, stocksMovements, createdItems }
+       
         })
   }
 
-  findAll() {
-    return `This action returns all purchases`;
+  async findAll() {
+    return await this.prismaService.purchase.findMany()
   }
+  
+  async findOne(id: number) {
+    return await this.prismaService.purchase.findUnique({
+      where:{
+        id
+      }
+    })
 
-  findOne(id: number) {
-    return `This action returns a #${id} purchase`;
   }
 
   update(id: number, updatePurchaseDto: UpdatePurchaseDto) {
