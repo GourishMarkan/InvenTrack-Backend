@@ -29,7 +29,7 @@ export class PurchasesController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.purchasesService.remove(+id);
+  remove(@Param('id') id: string,@CurrentUser() user) {
+    return this.purchasesService.remove(+id,user.id);
   }
 }

@@ -188,7 +188,52 @@ export class PurchasesService {
    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} purchase`;
+  async remove(id: number,userId:number) {
+    return await this.prismaService.$transaction(async(tx)=>{
+      // Get purchase items
+      const items=await tx.purchaseItem.findMany({
+        where:{
+          purchaseId:id,
+          isDeleted:false
+        }
+      })
+      // reverse stock
+      for(const {productId,quantity} of items){
+         await tx.product.update({
+          where:{id:productId},
+          data:{
+            stock:{
+              decrement:quantity
+            }
+          }
+         })
+      }
+      if (items.length > 0) {
+      await tx.stockMovement.createMany({
+        data: items.map((item) => ({
+          productId: item.productId,
+          quantity: -item.quantity,
+          type: "Adjustment", // or "Reversal"
+          createdById: userId,
+        })),
+      });
+    }
+  
+    // soft delete purchase items
+    await tx.purchaseItem.updateMany({
+      where: { purchaseId: id },
+      data: { isDeleted: true },
+    });
+  
+    // soft delete purchase
+    await tx.purchase.update({
+      where: { id },
+      data: { isDeleted: true },
+    });
+  
+    return { message: "Purchase deleted successfully" };
+    })
+
+  
   }
 }
