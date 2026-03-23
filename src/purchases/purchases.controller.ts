@@ -24,8 +24,8 @@ export class PurchasesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePurchaseDto: UpdatePurchaseDto) {
-    return this.purchasesService.update(+id, updatePurchaseDto);
+  update(@Param('id') id: string, @Body() updatePurchaseDto: UpdatePurchaseDto,@CurrentUser() user) {
+    return this.purchasesService.update(+id, updatePurchaseDto,user.id);
   }
 
   @Delete(':id')

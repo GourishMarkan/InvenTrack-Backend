@@ -101,6 +101,7 @@ model Purchase {
   supplier      Supplier       @relation(fields: [supplierId], references: [id])
   purchaseDate  DateTime
   createdBy Int 
+  isDeleted  Boolean @default(false)
   user User @relation("UserPurchases",fields: [createdBy],references: [id])
   @@index([supplierId])
 }
@@ -115,6 +116,7 @@ model PurchaseItem {
   purchase       Purchase        @relation(fields: [purchaseId], references: [id])
   costPrice      Int
   quantity       Int
+  isDeleted Boolean @default(false)
   stockMovements StockMovement[]
 }
 
@@ -130,6 +132,7 @@ model StockMovement {
   orderItem      OrderItem?        @relation(fields: [orderItemId], references: [id])
   purchaseItem   PurchaseItem?     @relation(fields: [purchaseItemId], references: [id])
   createdById Int 
+  isDeleted Boolean @default(false)
   userStockMovement User @relation("UserStockMovement",fields: [createdById],references: [id])
   @@index([orderItemId])
   @@index([purchaseItemId])
