@@ -11,6 +11,7 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 import { ProductsModule } from './products/products.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { PurchasesModule } from './purchases/purchases.module';
+import { StockMovementModule } from './stock-movement/stock-movement.module';
 @Module({
   imports: [
     PrismaModule,
@@ -22,7 +23,8 @@ import { PurchasesModule } from './purchases/purchases.module';
     AuthModule,
     ProductsModule,
     SupplierModule,
-    PurchasesModule
+    PurchasesModule,
+    StockMovementModule
   ],
   controllers: [AppController],
   providers: [AppService,{
