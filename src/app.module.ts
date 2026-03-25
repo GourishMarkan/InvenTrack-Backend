@@ -12,6 +12,7 @@ import { ProductsModule } from './products/products.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { PurchasesModule } from './purchases/purchases.module';
 import { StockMovementModule } from './stock-movement/stock-movement.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 @Module({
   imports: [
     PrismaModule,
@@ -24,7 +25,8 @@ import { StockMovementModule } from './stock-movement/stock-movement.module';
     ProductsModule,
     SupplierModule,
     PurchasesModule,
-    StockMovementModule
+    StockMovementModule,
+    DashboardModule
   ],
   controllers: [AppController],
   providers: [AppService,{
