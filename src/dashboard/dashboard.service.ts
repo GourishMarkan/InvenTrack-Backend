@@ -102,7 +102,31 @@ export class DashboardService {
 
 
   }
+  async getAnalyticsPurchase(to:Date,from:Date){
+    const purchases=
+      await this.prismaService.purchase.groupBy({
+     by:[  'createdAt'],
+     where:{
+      createdAt:{
+        gte:from,
+        lte:to
+      }
+     },
+     _sum:{total:true,totalQuantity:true}
 
+      })
+      return purchases;
+  
+
+  }
+
+   async getTopProducts(to:Date,from:Date){
+    
+   }
+
+  async getAnalyticsSupplier(){
+
+  }
   findOne(id: number) {
     return `This action returns a #${id} dashboard`;
   }

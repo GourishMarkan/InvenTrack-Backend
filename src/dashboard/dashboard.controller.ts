@@ -19,10 +19,29 @@ export class DashboardController {
    getSummary(@Param('to')to:string,@Param('from') from:string){
     return this.dashboardService.getSummary(to ,from)
    }
+
+   @Get("/analytics/purchases")
+   getAnalyticsPurchases(
+    @Param('to') to:Date,
+    @Param('from')from:Date
+   ){
+    return this.dashboardService.getAnalyticsPurchase(to,from);
+   }
+
+   @Get('/analytics/top-products')
+   getTopPurchases(){
+    
+   }
+   @Get('/analytics/Supplier')
+   getSupplierAnalysis(){
+
+   }
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDashboardDto: UpdateDashboardDto) {
     return this.dashboardService.update(+id, updateDashboardDto);
   }
+
+  
 
   @Delete(':id')
   remove(@Param('id') id: string) {
