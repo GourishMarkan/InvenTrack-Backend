@@ -103,28 +103,70 @@ export class DashboardService {
 
   }
   async getAnalyticsPurchase(to:Date,from:Date){
-    const purchases=
-      await this.prismaService.purchase.groupBy({
-     by:[  'createdAt'],
-     where:{
-      createdAt:{
-        gte:from,
-        lte:to
-      }
-     },
-     _sum:{total:true,totalQuantity:true}
+    // const purchases=
+    //   await this.prismaService.purchase.groupBy({
+    //  by:[  'createdAt'],
+    //  where:{
+    //   createdAt:{
+    //     gte:from,
+    //     lte:to
+    //   }
+    //  },
+    //  _sum:{total:true,totalQuantity:true}
 
-      })
-      return purchases;
+    //   })
+    //   return purchases;
+    const purchases=await this.prismaService.$queryRaw<{
+      date:string;
+      totalQuantity:number;
+      totalAmount:number;
+
+    }[]>`SELECT DATE("createdAt") as date,SUM("total") as "totalAmount",Sum("totalQuantity") as "totalQuantity" FROM "Purchase" WHERE "createdAt">=${from} And "createdAt"<=${to} GROUP BY DATE("createdAt") ORDER BY DATE("createdAt") ASC`
+
+    return purchases;
   
 
   }
 
    async getTopProducts(to:Date,from:Date){
-    
+     const topProduct=await this.prismaService.$queryRaw<{
+      productId:number;
+      productName:string;
+      totalQuantity:number;
+      totalRevenue:number;
+
+     }>` SELECT 
+      pi."productId" as "productName",
+      pro."name" as "productName",
+      SUM(pi."quantity") as "totalQuantity",
+      SUM(pi."quantity" * pro."sellingPrice") as "totalRevenue"
+    FROM "PurchaseItem" pi
+    JOIN "Purchase" purc
+      ON pi."purchaseId" = purc."id"
+    JOIN "Product" pro
+      ON pi."productId" = pro."id"
+    WHERE purc."createdAt" >= ${from}
+      AND purc."createdAt" <= ${to}
+    GROUP BY pi."productId", pro."name"
+    ORDER BY "totalQuantity" DESC
+    LIMIT 5`;
+     return topProduct;
    }
 
-  async getAnalyticsSupplier(){
+  async getAnalyticsSupplier(to:Date,from:Date){
+    const topSupplier=await this.prismaService.$queryRaw<{supplierName:string;totalPurchaseAmount:number}>
+    `
+    SELECT s."name" as "supplierName",COALESCE(SUM(purc."total"), 0) as "totalPurchaseAmount" FROM "Supplier" s JOIN "Purchase" purc 
+    ON purc."supplierId"=s."id"
+    WHERE purc."createdAt">=${from}
+    AND purc."createdAt"<=${to}
+    AND s."isDeleted"=false
+    
+    GROUP BY s."id",s."name"
+    ORDER BY "totalPurchaseAmount" DESC
+    LIMIT 5
+    `
+    return topSupplier;
 
   }
   findOne(id: number) {

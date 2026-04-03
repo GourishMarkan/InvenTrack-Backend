@@ -108,6 +108,7 @@ model Purchase {
   isDeleted  Boolean @default(false)
   user User @relation("UserPurchases",fields: [createdBy],references: [id])
   @@index([supplierId])
+  @@index([createdAt])
 }
 
 // purchase Item
@@ -150,6 +151,35 @@ model MinStock{
   product Product @relation(fields: [productId],references: [id])
 }
 
+// daily sale and expense tracker
+
+model DailyLedger{
+  id Int @id @default(autoincrement())
+  totalSales Int
+  date DateTime @unique
+  cashInHand Int
+  upiAmount Int
+  dues Int
+  expenses Expenses[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime 
+
+}
+
+// expenses table
+model Expenses{
+  id Int @id @default(autoincrement())
+  date DateTime
+  amount Int
+  dailyLedgerId Int
+  dailyLedger DailyLedger @relation(fields: [dailyLedgerId],references: [id])
+  type ExpensesType @default(ShopExpense)
+  paymentMode PaymentType @default(Cash)
+  createdAt DateTime @default(now())
+
+  
+}
+
 enum PaymentType {
   Cash
   Upi
@@ -173,6 +203,12 @@ enum StockMovementType {
   Purchase
   Wastage
   Adjustment
+}
+
+enum ExpensesType {
+  ShopExpense
+  HouseExpense
+
 }
 
 // model of order Item
