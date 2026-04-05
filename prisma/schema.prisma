@@ -157,25 +157,26 @@ model DailyLedger{
   id Int @id @default(autoincrement())
   totalSales Int
   date DateTime @unique
-  cashInHand Int
-  upiAmount Int
-  dues Int
+  cashInHand Int?
+  upiAmount Int?
+  dues Int?
   expenses Expenses[]
   createdAt DateTime @default(now())
-  updatedAt DateTime 
+  updatedAt DateTime @updatedAt
 
 }
 
 // expenses table
 model Expenses{
   id Int @id @default(autoincrement())
-  date DateTime
+  // date DateTime
   amount Int
   dailyLedgerId Int
   dailyLedger DailyLedger @relation(fields: [dailyLedgerId],references: [id])
   type ExpensesType @default(ShopExpense)
   paymentMode PaymentType @default(Cash)
   createdAt DateTime @default(now())
+  @@index([dailyLedgerId])
 
   
 }

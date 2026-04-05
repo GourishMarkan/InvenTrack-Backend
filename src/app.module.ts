@@ -13,6 +13,7 @@ import { SupplierModule } from './supplier/supplier.module';
 import { PurchasesModule } from './purchases/purchases.module';
 import { StockMovementModule } from './stock-movement/stock-movement.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { DailyLedgerModule } from './daily-ledger/daily-ledger.module';
 @Module({
   imports: [
     PrismaModule,
@@ -26,7 +27,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
     SupplierModule,
     PurchasesModule,
     StockMovementModule,
-    DashboardModule
+    DashboardModule,
+    DailyLedgerModule
   ],
   controllers: [AppController],
   providers: [AppService,{
