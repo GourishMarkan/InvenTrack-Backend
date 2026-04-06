@@ -29,7 +29,7 @@ export class DashboardController {
    }
 
    @Get('/analytics/top-products')
-   getTopProducts(to,from){
+   getTopProducts(@Body('to')to:Date,@Body('from') from:Date){
     return this.dashboardService.getTopProducts(to,from)
     
    }

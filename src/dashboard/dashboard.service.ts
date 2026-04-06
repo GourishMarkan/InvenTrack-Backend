@@ -179,7 +179,11 @@ export class DashboardService {
       },
     },
     include: {
-      expenses: true,
+      expenses:{
+       where:{
+        type:"ShopExpense"
+       }
+      }
     },
     orderBy: {
       date: 'asc',

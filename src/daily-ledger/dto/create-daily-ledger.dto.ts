@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsDateString, IsArray, ValidateNested, IsEnum } from 'class-validator';
+import { IsInt, IsOptional, IsDateString, IsArray, ValidateNested, IsEnum, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PaymentType,ExpensesType } from '@prisma/client';
  // Adjust import path based on your Prisma setup
@@ -6,6 +6,8 @@ import { PaymentType,ExpensesType } from '@prisma/client';
 export class CreateExpenseDto {
   @IsInt()
   amount: number;
+  @IsString()
+  name:string;
 
   @IsOptional()
   @IsEnum(ExpensesType)

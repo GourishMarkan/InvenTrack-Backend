@@ -171,6 +171,7 @@ model Expenses{
   id Int @id @default(autoincrement())
   // date DateTime
   amount Int
+  name String
   dailyLedgerId Int
   dailyLedger DailyLedger @relation(fields: [dailyLedgerId],references: [id])
   type ExpensesType @default(ShopExpense)

@@ -23,6 +23,7 @@ export class DailyLedgerService {
                 data:
                   expenses.map((e)=>({
                     ...e,
+                    // name:e.name,
                     dailyLedgerId:ledger.id,
                     
                   }))
@@ -32,6 +33,9 @@ export class DailyLedgerService {
 
           
           return ledger;
+    },{
+          maxWait: 5000,   // Wait up to 5s for a connection
+      timeout: 15000
     })
   }
 
@@ -78,6 +82,7 @@ export class DailyLedgerService {
         else {
           await tx.expenses.create({
             data: {
+              name:expense.name!,
                amount: expense.amount!,
     type: expense.type,
     paymentMode: expense.paymentMode, 
