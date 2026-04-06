@@ -11,10 +11,10 @@ export class DashboardController {
 
  
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.dashboardService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.dashboardService.findOne(+id);
+  // }
   @Get('/summary')
    getSummary(@Param('to')to:string,@Param('from') from:string){
     return this.dashboardService.getSummary(to ,from)

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateDashboardDto } from './dto/create-dashboard.dto';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-
+import { startOfISOWeek, getISOWeek, getISOWeekYear } from 'date-fns';
 @Injectable()
 export class DashboardService {
   constructor(private readonly prismaService:PrismaService){}
@@ -202,9 +202,54 @@ export class DashboardService {
     };
   });
 }
-  findOne(id: number) {
-    return `This action returns a #${id} dashboard`;
+
+async getWeeklyProfit(from: Date, to: Date) {
+  const ledgers = await this.prismaService.dailyLedger.findMany({
+    where: {
+      date: {
+        gte: from,
+        lte: to,
+      },
+    },
+    include: {
+      expenses: true,
+    },
+    orderBy: {
+      date: 'asc',
+    },
+  });
+
+  const weeklyMap = new Map<string, number>();
+
+  for (const ledger of ledgers) {
+    // 1️⃣ calculate daily profit
+    const totalExpenses = ledger.expenses.reduce(
+      (sum, e) => sum + e.amount,
+      0
+    );
+
+    const profit = (ledger.totalSales ?? 0) - totalExpenses;
+
+
+    const week = getISOWeek(ledger.date);
+    const year = getISOWeekYear(ledger.date);
+
+   
+    const weekKey = `${year}-W${String(week).padStart(2, '0')}`;
+
+
+    weeklyMap.set(
+      weekKey,
+      (weeklyMap.get(weekKey) ?? 0) + profit
+    );
   }
+
+
+  return Array.from(weeklyMap.entries()).map(([week, profit]) => ({
+    week,
+    profit,
+  }));
+}
 
   update(id: number, updateDashboardDto: UpdateDashboardDto) {
     return `This action updates a #${id} dashboard`;

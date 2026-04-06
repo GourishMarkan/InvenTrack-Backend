@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePurchaseDto } from './dto/create-purchase.dto';
+import { CreatePurchaseDto, PurchaseItem } from './dto/create-purchase.dto';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -8,12 +8,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class PurchasesService {
   constructor(private prismaService:PrismaService){}
   async create(createPurchaseDto: CreatePurchaseDto,userId:number) {
-    await this.prismaService.$transaction(async(tx)=>{
+    // console.log("createPurchase",createPurchaseDto)
+   return await this.prismaService.$transaction(async(tx)=>{
 
       // 
 
 
          const { purchaseItems, supplierId, ...rest } = createPurchaseDto;
+         console.log("inside transactions",tx)
           const purchase=await tx.purchase.create({
             data:{
              ...rest,
@@ -21,45 +23,47 @@ export class PurchasesService {
           user:{ connect: { id: userId } }
             },
           })
+          console.log("purchase",purchase);
           // purchasesItem crud below
 
-          const createdItems=await  tx.purchaseItem.createMany({
+          const createdItems=await  tx.purchaseItem.createManyAndReturn({
             data:purchaseItems.map((item)=>({
               ...item,
                 purchaseId:purchase.id
 
             }))
           })
+          console.log("createdItems",createdItems)
 
           // updating the stock 
-        for (const item of purchaseItems) {
-            await tx.product.update({
-              where:{
-                id:item.productId
-              },
-              data:{
-                stock:{
-                  increment:item.quantity
-                }
-              }
-            })
-        }
+            await Promise.all(
+        purchaseItems.map((item) =>
+          tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.quantity } }
+          })
+        )
+      );
           // stockMovement 
           // purchaseItems.map(async(item)=>(
-          const stocksMovements=  await tx.stockMovement.createMany({
-            data:purchaseItems.map((item)=>({
+          const stocksMovements=  await tx.stockMovement.createManyAndReturn({
+            data:createdItems.map((item:any)=>({
               productId:item.productId,
                 quantity :item.quantity,
               type:"Purchase",
               createdById:userId,
-              purchaseItemId:purchase.id
+              purchaseItemId:item.id
               // userStockMovement:{connect:{id:userId}}
               
 
             }))
           })
+          console.log("stock movements",stocksMovements)
           return { purchase, stocksMovements, createdItems }
        
+        },{
+          maxWait: 5000,   // Wait up to 5s for a connection
+      timeout: 15000
         })
   }
 

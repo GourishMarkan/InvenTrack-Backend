@@ -30,7 +30,7 @@ export class StockMovementController {
     return this.stockMovementService.findByType(type);
   }
 
-  // 4️⃣ Get by date range
+  
   @Get('date')
   findByDate(
     @Query('from') from: string,
