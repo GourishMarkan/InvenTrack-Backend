@@ -10,9 +10,12 @@ import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
 @UseGuards(JwtAuthGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
-   
+  
+  // @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createProductDto: CreateProductDto,@CurrentUser() user ) {
+  create(@Body() createProductDto: CreateProductDto,@CurrentUser() user:any) {
+    console.log("user is ",user)
+
     return this.productsService.create(createProductDto,user.id);
   }
 

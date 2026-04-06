@@ -9,17 +9,23 @@ export class UsersService {
   constructor(private prisma:PrismaService){}
   async create(createUserInput: CreateUserInput) {
     try {
+      // console.log("input",createUserInput);
 
      const hashedPassword=await bcrypt.hash(createUserInput.password,10)
+    //  console.log("hashed paaa",hashedPassword);
   
       const user=await this.prisma.user.create({
         data:{
-          ...createUserInput,
-          password:hashedPassword
-
+        name:createUserInput.name,
+        // ...createUserInput,
+          password:hashedPassword,
+          email:createUserInput.email,
+          role:createUserInput.role
+// 
         },
        
       })
+      // console.log("user is",user);
       const { password, ...result } = user;
       return result;
     } catch (error) {

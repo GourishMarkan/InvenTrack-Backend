@@ -68,21 +68,23 @@ export class DailyLedgerService {
 
       for(const expense of expenses??[]){
 
-        await tx.expenses.upsert({
-          where:{
-            // dailyLedgerId:ledger.id
-            id:expense.id||-1
-          },
-          update:{
-            ...expense
-          },
-          create:{
-           amount: expense.amount!, 
-            type: expense.type,
-            paymentMode: expense.paymentMode,
-            dailyLedgerId: ledger.id
-          }
-        })
+         if (expense.id) {
+          await tx.expenses.update({
+            where: { id: expense.id },
+            data: { ...expense }
+          });
+        } 
+        // Otherwise, create a new one
+        else {
+          await tx.expenses.create({
+            data: {
+               amount: expense.amount!,
+    type: expense.type,
+    paymentMode: expense.paymentMode, 
+              dailyLedgerId: ledger.id
+            }
+          });
+        }
 
       }
       return ledger;
@@ -92,17 +94,71 @@ export class DailyLedgerService {
 
   async remove(id: number) {
     return await this.prismaService.$transaction(async(tx)=>{
-      const ledger=await tx.dailyLedger.delete({
-        where:{
-          id
-        }
-      })
       await tx.expenses.deleteMany({
         where:{
           dailyLedgerId:id
         }
       })
+      const ledger=await tx.dailyLedger.delete({
+        where:{
+          id
+        }
+      })
       return ledger;
     })
+  }
+
+  async getProfit(to:Date,from:Date){
+    // const ledger=await this.prismaService.dailyLedger.findFirst({
+    //   where:{
+    //     id
+    //   },
+    //   include:{
+    //     expenses:true
+    //   }
+    // })
+
+    const [totalSales,totalexpenses]=await Promise.all([
+      
+      this.prismaService.dailyLedger.aggregate({
+        _sum:{
+          totalSales:true
+        },
+        where:{
+      
+          date:{
+            gte:from,
+            lte:to
+          }
+        },
+        
+        
+      }),
+
+      this.prismaService.expenses.aggregate({
+        _sum:{
+          amount:true
+        },
+        where:{
+ 
+         dailyLedger:{
+          date:{
+                 gte:from,
+            lte:to
+          }
+         }
+        },
+
+      })
+
+    ])
+    const sales = totalSales?._sum.totalSales ?? 0;
+    const expenses =totalexpenses._sum?.amount ?? 0;
+
+    return {sales,expenses,profit:sales-expenses}
+
+    
+
+  
   }
 }

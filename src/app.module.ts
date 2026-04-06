@@ -31,9 +31,11 @@ import { DailyLedgerModule } from './daily-ledger/daily-ledger.module';
     DailyLedgerModule
   ],
   controllers: [AppController],
-  providers: [AppService,{
+  providers: [AppService,
+    {
     provide:APP_GUARD,
     useClass:JwtAuthGuard,
-  }],
+  }
+],
 })
 export class AppModule {}

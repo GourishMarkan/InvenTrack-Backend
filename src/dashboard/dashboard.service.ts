@@ -169,6 +169,39 @@ export class DashboardService {
     return topSupplier;
 
   }
+
+  async getProfitPerDay(from: Date, to: Date) {
+  const ledgers = await this.prismaService.dailyLedger.findMany({
+    where: {
+      date: {
+        gte: from,
+        lte: to,
+      },
+    },
+    include: {
+      expenses: true,
+    },
+    orderBy: {
+      date: 'asc',
+    },
+  });
+
+  return ledgers.map((ledger) => {
+    const totalExpenses = ledger.expenses.reduce(
+      (acc, exp) => acc + exp.amount,
+      0
+    );
+
+    const totalSales = ledger.totalSales ?? 0;
+
+    return {
+      date: ledger.date,
+      totalSales,
+      totalExpenses,
+      profit: totalSales - totalExpenses,
+    };
+  });
+}
   findOne(id: number) {
     return `This action returns a #${id} dashboard`;
   }

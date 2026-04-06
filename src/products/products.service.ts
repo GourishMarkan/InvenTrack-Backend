@@ -15,12 +15,15 @@ export class ProductsService {
            throw new NotFoundException('Supplier not found');
       }
      const {supplierId,...rest}=createProductDto;
+     console.log("user is id",userId)
  
       const product=await this.prismaService.product.create({
         data:{
-          ...createProductDto,
-          createdById:userId,
-          updatedById:userId
+          ...rest,
+               supplier: { connect: { id: supplierId } },
+
+        createdBy: { connect: { id: userId } },
+    updatedBy: { connect: { id: userId } }
           
           
 

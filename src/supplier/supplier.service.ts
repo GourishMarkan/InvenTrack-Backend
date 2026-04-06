@@ -62,9 +62,12 @@ async update(id: number, updateSupplierDto: UpdateSupplierDto) {
 
 async remove(id: number) {
   try {
-    return this.prismaService.supplier.delete({
+    return this.prismaService.supplier.update({
       where:{
-        id
+        id:id
+      },
+      data:{
+        isDeleted:true
       }
     })
   } catch (error) {

@@ -29,12 +29,19 @@ export class DashboardController {
    }
 
    @Get('/analytics/top-products')
-   getTopPurchases(){
+   getTopProducts(to,from){
+    return this.dashboardService.getTopProducts(to,from)
     
    }
    @Get('/analytics/Supplier')
-   getSupplierAnalysis(){
+   getSupplierAnalysis(to,from){
+    return this.dashboardService.getAnalyticsSupplier(to,from)
 
+   }
+
+   @Get(`/analytics/profit-per-day`)
+   getProfitPerDay(to,from){
+    return this.dashboardService.getProfitPerDay(to,from)
    }
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDashboardDto: UpdateDashboardDto) {
