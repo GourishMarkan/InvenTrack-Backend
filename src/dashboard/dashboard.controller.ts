@@ -16,14 +16,13 @@ export class DashboardController {
   //   return this.dashboardService.findOne(+id);
   // }
   @Get('/summary')
-   getSummary(@Param('to')to:string,@Param('from') from:string){
+   getSummary(@Body('to')to:string,@Body('from') from:string){
     return this.dashboardService.getSummary(to ,from)
    }
 
    @Get("/analytics/purchases")
    getAnalyticsPurchases(
-    @Param('to') to:Date,
-    @Param('from')from:Date
+  @Body('to')to:Date,@Body('from') from:Date
    ){
     return this.dashboardService.getAnalyticsPurchase(to,from);
    }
@@ -34,24 +33,23 @@ export class DashboardController {
     
    }
    @Get('/analytics/Supplier')
-   getSupplierAnalysis(to,from){
+   getSupplierAnalysis(@Body('to')to:Date,@Body('from') from:Date){
     return this.dashboardService.getAnalyticsSupplier(to,from)
 
    }
 
    @Get(`/analytics/profit-per-day`)
-   getProfitPerDay(to,from){
+   getProfitPerDay(@Body('to')to:Date,@Body('from') from:Date){
     return this.dashboardService.getProfitPerDay(to,from)
    }
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDashboardDto: UpdateDashboardDto) {
-    return this.dashboardService.update(+id, updateDashboardDto);
+
+   @Get(`/analytics/profit-week`)
+
+  getProfitWeekly(@Body('to')to:Date,@Body('from') from:Date) {
+    return this.dashboardService.getWeeklyProfit(to,from);
   }
 
   
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.dashboardService.remove(+id);
-  }
+  
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateDashboardDto } from './dto/create-dashboard.dto';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { startOfISOWeek, getISOWeek, getISOWeekYear } from 'date-fns';
+import { startOfISOWeek, getISOWeek, getISOWeekYear, format } from 'date-fns';
 @Injectable()
 export class DashboardService {
   constructor(private readonly prismaService:PrismaService){}
@@ -255,11 +255,92 @@ async getWeeklyProfit(from: Date, to: Date) {
   }));
 }
 
-  update(id: number, updateDashboardDto: UpdateDashboardDto) {
-    return `This action updates a #${id} dashboard`;
+
+
+
+async getMonthlyProfit(from: Date, to: Date) {
+  const ledgers = await this.prismaService.dailyLedger.findMany({
+    where: {
+      date: {
+        gte: from,
+        lte: to,
+      },
+    },
+    include: {
+      expenses: true,
+    },
+    orderBy: {
+      date: 'asc',
+    },
+  });
+
+  const monthlyMap = new Map<string, number>();
+
+  for (const ledger of ledgers) {
+    const totalExpenses = ledger.expenses.reduce(
+      (sum, e) => sum + e.amount,
+      0
+    );
+
+    const profit = (ledger.totalSales ?? 0) - totalExpenses;
+
+    // month key using date-fns
+    const monthKey = format(ledger.date, 'yyyy-MM');
+
+    monthlyMap.set(
+      monthKey,
+      (monthlyMap.get(monthKey) ?? 0) + profit
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} dashboard`;
+ 
+
+  
+  return Array.from(monthlyMap.entries()).map(([month, profit]) => ({
+    month,
+    profit,
+  }));
+}
+
+async getYearlyProfit(from: Date, to: Date) {
+  const ledgers = await this.prismaService.dailyLedger.findMany({
+    where: {
+      date: {
+        gte: from,
+        lte: to,
+      },
+    },
+    include: {
+      expenses: true,
+    },
+    orderBy: {
+      date: 'asc',
+    },
+  });
+
+  const yearlyMap = new Map<string, number>();
+
+  for (const ledger of ledgers) {
+    const totalExpenses = ledger.expenses.reduce(
+      (sum, e) => sum + e.amount,
+      0
+    );
+
+    const profit = (ledger.totalSales ?? 0) - totalExpenses;
+
+
+    const yearKey = format(ledger.date, 'yyyy');
+
+    yearlyMap.set(
+      yearKey,
+      (yearlyMap.get(yearKey) ?? 0) + profit
+    );
   }
+
+  return Array.from(yearlyMap.entries()).map(([year, profit]) => ({
+    year,
+    profit,
+  }));
+}
+
 }
