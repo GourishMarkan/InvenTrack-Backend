@@ -240,4 +240,55 @@ export class PurchasesService {
 
   
   }
+
+  // function to send message from whatsapp 
+
+  async orderItems(items:[{
+    id:number,
+    name:string,
+    quantity:number
+  }]){
+    // const orderingitems=await this.prismaService.product.findMany({
+    //   where:{
+    //     id:{
+    //       in:items.map((i)=>i.id)
+    //     }
+    //   }
+    //   ,
+    //   select:{
+    //     supplier:true,
+    //     supplierId:true,
+    //     name:true,
+    //   }
+  
+    // 
+   
+  // ).
+  //  const grouped = orderingItems.reduce((acc, product) => {
+  //   const key = product.supplierId;
+  //   if (!acc[key]) {
+  //     acc[key] = {
+  //       supplierId: product.supplierId,
+  //       supplierName: product.supplier.name,
+  //       supplierMobileNumber: product.supplier.mobileNumber,
+  //       products: []
+  //     };
+  //   }
+  //   acc[key].products.push({ id: product.id, name: product.name });
+  //   return acc;
+  // }, {} as Record<number, any>);
+
+  // return Object.values(grouped);
+  const productIds = items.map(i => i.id);
+  const orderingItemsGroupedBySupplier=await this.prismaService.$queryRaw`
+  SELECT p."name" as "name ",p."id" as"id", s."mobileNumber" as"SupplierMobileNumber",      s."id" as "supplierId",
+      s."name" as "supplierName" FROM "Product" p JOIN "Supplier" s on p."supplierId"=s."id"
+  WHERE p."id" IN ANY(${productIds}::int[])
+    GROUP BY  s."id"
+  
+  `
+  return orderingItemsGroupedBySupplier;
+
+
+  }
 }

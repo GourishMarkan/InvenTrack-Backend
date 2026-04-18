@@ -170,6 +170,19 @@ export class DashboardService {
 
   }
 
+  async getLowStockProducts(){
+    const lowStockProducts=await this.prismaService.$queryRaw`
+    SELECT * FROM "PRODUCT"
+    WHERE stock<="minStock"
+    AND "isDeleted"=false
+    `
+
+    return lowStockProducts
+    
+  }
+
+
+
   async getProfitPerDay(from: Date, to: Date) {
   const ledgers = await this.prismaService.dailyLedger.findMany({
     where: {

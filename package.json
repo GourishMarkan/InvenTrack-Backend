@@ -33,6 +33,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.5.0",
+    "axios": "^1.15.0",
     "bcrypt": "^6.0.0",
     "brace-expansion": "^5.0.5",
     "class-transformer": "^0.5.1",

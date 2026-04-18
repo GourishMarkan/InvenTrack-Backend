@@ -15,6 +15,7 @@ import { StockMovementModule } from './stock-movement/stock-movement.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { DailyLedgerModule } from './daily-ledger/daily-ledger.module';
 import { OrdersModule } from './orders/orders.module';
+import { WhatsappModule } from './whatsapp/whatsapp.module';
 @Module({
   imports: [
     PrismaModule,
@@ -30,7 +31,8 @@ import { OrdersModule } from './orders/orders.module';
     StockMovementModule,
     DashboardModule,
     DailyLedgerModule,
-    OrdersModule
+    OrdersModule,
+    WhatsappModule
   ],
   controllers: [AppController],
   providers: [AppService,
