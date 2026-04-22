@@ -16,8 +16,18 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { DailyLedgerModule } from './daily-ledger/daily-ledger.module';
 import { OrdersModule } from './orders/orders.module';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
+import { BullModule } from '@nestjs/bullmq';
 @Module({
   imports: [
+    BullModule.forRoot({
+       connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    BullModule.registerQueue({
+      name:"notification"
+    }),
     PrismaModule,
     ConfigModule.forRoot({
       envFilePath:`.env`,

@@ -2,11 +2,23 @@ import { Injectable } from '@nestjs/common';
 import { CreatePurchaseDto, PurchaseItem } from './dto/create-purchase.dto';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
+interface SupplierOrder {
+    supplierId: number;
+    supplierName: string;
+    supplierMobileNumber: string;
+    products: Array<{
+      id: number;
+      name: string;
+      quantity: number;
+    }>;
+  }
 
 @Injectable()
 export class PurchasesService {
-  constructor(private prismaService:PrismaService){}
+  constructor(private prismaService:PrismaService,@InjectQueue("notification") private notificationQueue:Queue){}
   async create(createPurchaseDto: CreatePurchaseDto,userId:number) {
     // console.log("createPurchase",createPurchaseDto)
    return await this.prismaService.$transaction(async(tx)=>{
@@ -279,16 +291,38 @@ export class PurchasesService {
   // }, {} as Record<number, any>);
 
   // return Object.values(grouped);
+  
   const productIds = items.map(i => i.id);
-  const orderingItemsGroupedBySupplier=await this.prismaService.$queryRaw`
-  SELECT p."name" as "name ",p."id" as"id", s."mobileNumber" as"SupplierMobileNumber",      s."id" as "supplierId",
-      s."name" as "supplierName" FROM "Product" p JOIN "Supplier" s on p."supplierId"=s."id"
-  WHERE p."id" IN ANY(${productIds}::int[])
-    GROUP BY  s."id"
+  const orderingItemsGroupedBySupplier=await this.prismaService.$queryRaw<SupplierOrder[]>`
+  SELECT    s."id" as "supplierId",
+      s."name" as "supplierName",
+      s."mobileNumber" as "supplierMobileNumber",
+      json_agg(
+        json_build_object(
+          'id', p."id",
+          'name', p."name",
+          'quantity', pi."quantity"
+        ) ORDER BY p."id"
+      ) as "products"
+    FROM "Product" p
+    JOIN "Supplier" s ON p."supplierId" = s."id"
+    LEFT JOIN "PurchaseItem" pi ON p."id" = pi."productId"
+    WHERE p."id" = ANY(${productIds}::int[])
+    AND p."isDeleted" = false
+    GROUP BY s."id", s."name", s."mobileNumber"
+    ORDER BY s."id"
   
   `
-  return orderingItemsGroupedBySupplier;
-
+  // return orderingItemsGroupedBySupplier;
+  if (orderingItemsGroupedBySupplier.length > 0) {
+    await this.notificationQueue.addBulk(
+      orderingItemsGroupedBySupplier.map((orderItem) => ({
+        name: "send-whatsapp-purchase-order",
+        data: orderItem
+      }))
+    );
 
   }
+  return orderingItemsGroupedBySupplier;
+}
 }
