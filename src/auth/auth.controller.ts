@@ -4,14 +4,16 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 import { JwtAuthGuard } from '../guards/jwt.guard';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  //  @SkipA
+  //  @SkipAuthGuard()
    async login(@Request() req:any,@Res({ passthrough: true }) res){
   const token = await this.authService.login(req.user);
   res.cookie('access_token', token.access_token, {

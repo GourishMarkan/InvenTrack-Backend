@@ -4,8 +4,9 @@ import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { Prisma } from '@prisma/client';
 
-interface SupplierOrder {
+export interface SupplierOrder {
     supplierId: number;
     supplierName: string;
     supplierMobileNumber: string;
@@ -255,11 +256,12 @@ export class PurchasesService {
 
   // function to send message from whatsapp 
 
-  async orderItems(items:[{
+  async orderItems(items:Array<{
     id:number,
     name:string,
     quantity:number
-  }]){
+  }>): Promise<SupplierOrder[]> {
+    console.log("array is",items)
     // const orderingitems=await this.prismaService.product.findMany({
     //   where:{
     //     id:{
@@ -292,7 +294,11 @@ export class PurchasesService {
 
   // return Object.values(grouped);
   
+  
   const productIds = items.map(i => i.id);
+  // Create a CASE statement for quantity mapping
+    const caseClauses = items.map(item => `WHEN ${item.id} THEN ${item.quantity}`).join(' ');
+  console.log("productsIds,",productIds)
   const orderingItemsGroupedBySupplier=await this.prismaService.$queryRaw<SupplierOrder[]>`
   SELECT    s."id" as "supplierId",
       s."name" as "supplierName",
@@ -301,7 +307,7 @@ export class PurchasesService {
         json_build_object(
           'id', p."id",
           'name', p."name",
-          'quantity', pi."quantity"
+          'quantity', CASE p."id" ${Prisma.raw(caseClauses)} ELSE 0 END
         ) ORDER BY p."id"
       ) as "products"
     FROM "Product" p
@@ -313,13 +319,17 @@ export class PurchasesService {
     ORDER BY s."id"
   
   `
+  console.log("orderGroup",orderingItemsGroupedBySupplier);
   // return orderingItemsGroupedBySupplier;
   if (orderingItemsGroupedBySupplier.length > 0) {
+    console.log("ordering items")
+     const jobs = orderingItemsGroupedBySupplier.map((orderItem) => ({
+    name: "send-whatsapp-purchase-order",
+    data: orderItem,
+  }));
+  console.log("jobs",jobs)
     await this.notificationQueue.addBulk(
-      orderingItemsGroupedBySupplier.map((orderItem) => ({
-        name: "send-whatsapp-purchase-order",
-        data: orderItem
-      }))
+      jobs
     );
 
   }

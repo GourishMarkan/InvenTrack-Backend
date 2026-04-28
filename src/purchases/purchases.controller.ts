@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { PurchasesService } from './purchases.service';
+import { PurchasesService, SupplierOrder } from './purchases.service';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import { JwtAuthGuard } from 'src/guards/jwt.guard';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
+import { Public } from 'src/common/decorators/public.decorator';
 @UseGuards(JwtAuthGuard)
 @Controller('purchases')
 export class PurchasesController {
@@ -32,5 +33,18 @@ export class PurchasesController {
   @Delete(':id')
   remove(@Param('id') id: string,@CurrentUser() user) {
     return this.purchasesService.remove(+id,user.id);
+  }
+  // @Public()
+  @Post("/order-items")
+  orderItemsWhatsapp(
+    @Body('items') items: any
+  ){
+     console.log('Received items in controller:', items); // Debug log
+    
+    // if (!items || !Array.isArray(items)) {
+    //   throw new Error('Items must be an array');
+    // }
+    return this.purchasesService.orderItems(items)
+
   }
 }

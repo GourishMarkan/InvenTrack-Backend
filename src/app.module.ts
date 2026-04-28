@@ -17,6 +17,8 @@ import { DailyLedgerModule } from './daily-ledger/daily-ledger.module';
 import { OrdersModule } from './orders/orders.module';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
 import { BullModule } from '@nestjs/bullmq';
+
+import { NotificationModule } from './notification.module';
 @Module({
   imports: [
     BullModule.forRoot({
@@ -42,14 +44,17 @@ import { BullModule } from '@nestjs/bullmq';
     DashboardModule,
     DailyLedgerModule,
     OrdersModule,
-    WhatsappModule
+    WhatsappModule,
+    NotificationModule
+   
   ],
   controllers: [AppController],
   providers: [AppService,
     {
     provide:APP_GUARD,
     useClass:JwtAuthGuard,
-  }
+  },
+  // NotificationProcessor
 ],
 })
 export class AppModule {}
