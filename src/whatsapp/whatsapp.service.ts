@@ -12,7 +12,7 @@ export class WhatsappService {
   }
 
     private formatItemsToString(items: Array<{ name: string; quantity: number }>) {
-    return items.map((i, ind) => `${i.name} ${i.name}  Quantity: ${i.quantity}`).join('\n');
+    return items.map((i, ind) => `${i.name}  Quantity: ${i.quantity}`).join(', ');
   }
 
   async sendOrderToSupplier(phoneNumber:any,
@@ -42,7 +42,7 @@ export class WhatsappService {
               {
                 type: 'text',
                 "parameter_name":"items",
-                text: "biscuit:10",
+                text: formattedItems,
               },
             ],
           },
@@ -57,7 +57,7 @@ export class WhatsappService {
       const response = await axios.post(this.baseUrl, template, {
         headers: {
           Authorization: `Bearer ${this.accessToken}`,
-          // Authorization: `Bearer EAAUW6lUNVqMBRavtU2C6qXW0Ap8h5FuS0VkLHsx6V8GyWkNNTWU5MpYZBb8eom0SHcsZC1pMZB93fGZClDj4W9zTmcKIPCBHZAA1naN53onlNy6zN9puaOgPP1g3rcc9zcSHkxG8OEOVurXEomq2fsBc7NrCgqpvCR5GYXNtiLidgZA79c3ErruoAh4KleZAUjtGQZDZD`,
+ 
           'Content-Type': 'application/json',
         },
       });
