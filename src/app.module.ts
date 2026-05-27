@@ -19,6 +19,7 @@ import { WhatsappModule } from './whatsapp/whatsapp.module';
 import { BullModule } from '@nestjs/bullmq';
 
 import { NotificationModule } from './notification.module';
+import { PdfModule } from './pdf/pdf.module';
 @Module({
   imports: [
     BullModule.forRoot({
@@ -45,7 +46,8 @@ import { NotificationModule } from './notification.module';
     DailyLedgerModule,
     OrdersModule,
     WhatsappModule,
-    NotificationModule
+    NotificationModule,
+    PdfModule
    
   ],
   controllers: [AppController],
