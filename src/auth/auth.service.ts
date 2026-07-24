@@ -30,7 +30,7 @@ export class AuthService {
 
     async login(user: any) {
       console.log("user",user);
-    const payload = { name: user.name, id: user.id,role:user.role };
+    const payload = { name: user.name, id: user.id,role:user.role,email:user.email };
       const access_token = await this.jwtService.signAsync(payload, {
             expiresIn: '1d',
             secret: jwtConstants.secret as string,

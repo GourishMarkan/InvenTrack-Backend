@@ -4,7 +4,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 import { JwtAuthGuard } from '../guards/jwt.guard';
-import { Public } from 'src/common/decorators/public.decorator';
+import { Public } from '../common/decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
