@@ -18,7 +18,7 @@ export class AuthController {
   const token = await this.authService.login(req.user);
   res.cookie('access_token', token.access_token, {
     httpOnly: true,   // 🔒 prevents JS access (XSS protection)
-    secure: true,     // use true in production (HTTPS)
+    secure:  process.env.NODE_ENV === "production",    // use true in production (HTTPS)
     sameSite: 'strict',
   });
 
