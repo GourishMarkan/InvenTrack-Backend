@@ -166,18 +166,5 @@ export class WhatsappService {
     }
 
   }
-  findAll() {
-    return `This action returns all whatsapp`;
-  }
 
-  findOne(id: number) {
-    return `This action returns a #${id} whatsapp`;
-  }
-
-
- 
-
-  remove(id: number) {
-    return `This action removes a #${id} whatsapp`;
-  }
 }
