@@ -38,6 +38,9 @@ export class ProductsService {
       return this.prismaService.product.findMany({
         where:{
           isDeleted:false
+        },
+        include:{
+          supplier:true
         }
       });
       
