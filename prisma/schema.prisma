@@ -54,6 +54,7 @@ model Product {
   stockMovements StockMovement[]
   createdById Int
   updatedById Int
+    sku      String? @unique 
   minStock Int
  createdBy User @relation("CreatedProducts",fields: [createdById],references: [id])
   updatedBy User @relation("UpdatedProducts",fields: [updatedById],references: [id])
