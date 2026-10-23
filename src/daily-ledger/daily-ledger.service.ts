@@ -5,7 +5,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class DailyLedgerService {
+
   constructor(private prismaService:PrismaService){}
+
   async create(createDailyLedgerDto: CreateDailyLedgerDto) {
     const {expenses=[],...rest}=createDailyLedgerDto;
     // using transaction

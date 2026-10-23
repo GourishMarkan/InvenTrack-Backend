@@ -74,6 +74,7 @@ model OrderItem {
   createdAt    DateTime @default(now())
   product        Product         @relation(fields: [productId], references: [id])
   order          Order           @relation(fields: [orderId], references: [id])
+
   stockMovements StockMovement[]
 
   @@index([orderId])
@@ -85,9 +86,13 @@ model Order {
   // createdBy Int
   orderItems    OrderItem[]
   createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  discount      Int           @default(0)
+  tax            Int           @default(0)
   total         Int
   paymentType   PaymentType   @default(Cash)
   paymentStatus PaymentStatus @default(Pending)
+  orderStatus   OrderStatus   @default(Pending)
   createdBy  Int
   userCreatedOrder User @relation("UserCreatedOrder",fields: [createdBy],references: [id])
 
@@ -212,6 +217,12 @@ enum ExpensesType {
   ShopExpense
   HouseExpense
 
+}
+
+enum OrderStatus {
+  Pending
+  Completed
+  Cancelled
 }
 
 // model of order Item
