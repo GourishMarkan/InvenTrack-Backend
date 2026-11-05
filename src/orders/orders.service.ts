@@ -141,8 +141,18 @@ export class OrdersService {
   }
 
  async  findAll() {
-    return await this.prisma.order.findMany();
-  }
+  
+  return this.prisma.order.findMany({
+    include: {
+      orderItems: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  });
+}
+  
 
   async findOne(id: number) {
     return  await this.prisma.order.findUnique({
