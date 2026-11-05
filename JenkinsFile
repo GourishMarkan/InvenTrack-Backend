@@ -1,0 +1,70 @@
+
+pipeline {
+    agent any
+
+    environment {
+        COMPOSE_PROJECT_NAME = "inventrack"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Checking out InvenTrack repository...'
+                checkout scm
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing dependencies...'
+                sh 'npm ci'
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                echo 'Building NestJS application...'
+                sh 'npm run build'
+            }
+        }
+
+        stage('Validate Docker Compose') {
+            steps {
+                echo 'Validating Docker Compose configuration...'
+                sh 'docker compose config -q'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building InvenTrack API image...'
+                sh 'docker compose build api'
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                echo 'Starting InvenTrack API and Redis...'
+                sh 'docker compose up -d'
+            }
+        }
+
+        stage('Verify Containers') {
+            steps {
+                echo 'Checking running containers...'
+                sh 'docker compose ps'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'InvenTrack deployed successfully!'
+        }
+
+        failure {
+            echo 'InvenTrack pipeline failed!'
+        }
+    }
+}
