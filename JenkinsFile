@@ -18,42 +18,42 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo 'Installing dependencies...'
-                sh 'npm ci'
+                bat 'npm ci'
             }
         }
 
         stage('Build Application') {
             steps {
                 echo 'Building NestJS application...'
-                sh 'npm run build'
+                bat 'npm run build'
             }
         }
 
         stage('Validate Docker Compose') {
             steps {
                 echo 'Validating Docker Compose configuration...'
-                sh 'docker compose config -q'
+                bat 'docker compose config -q'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 echo 'Building InvenTrack API image...'
-                sh 'docker compose build api'
+                bat 'docker compose build api'
             }
         }
 
         stage('Deploy Application') {
             steps {
                 echo 'Starting InvenTrack API and Redis...'
-                sh 'docker compose up -d'
+                bat 'docker compose up -d'
             }
         }
 
         stage('Verify Containers') {
             steps {
                 echo 'Checking running containers...'
-                sh 'docker compose ps'
+                bat 'docker compose ps'
             }
         }
     }
